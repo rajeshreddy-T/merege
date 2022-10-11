@@ -1,0 +1,78 @@
+// Merge K sorted lists
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class MergeKSortedLists {
+	public static void main(String[] args) {
+  
+		List<List<Integer>> lists = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {		
+			int[] sortedRandomArray =generateSorted(getRandomVal(1,100), 1,100);
+		
+				lists.add(Arrays.stream(sortedRandomArray).boxed().collect(Collectors.toList()));
+			
+		}					
+			
+
+		List<int[]> listSizesAndIndex = new ArrayList<>(); // [size, index]
+	
+		System.out.println("---------- using Streams for sorting -----------");
+		for (int i = 0; i < lists.size(); i++) {
+			listSizesAndIndex.add(new int[] { lists.get(i).size(), i });
+		}
+		System.out.println("----------Initial list sizes and index-----------");
+		for (int[] list : listSizesAndIndex) {
+			System.out.println(Arrays.toString(list));
+		}		
+
+		// sorting the list sizes and index using the stream api
+		listSizesAndIndex = listSizesAndIndex.stream().sorted(Comparator.comparingInt(a -> a[0])).collect(Collectors.toList());
+		System.out.println("----------Sorted list sizes and index => sequence-----------");
+		for (int[] list : listSizesAndIndex) {
+			System.out.println(Arrays.toString(list));
+		}			
+		long startTime = System.currentTimeMillis();
+		System.out.println(mergeKLists(lists, listSizesAndIndex));
+		long endTime = System.currentTimeMillis();
+		System.out.println("Time taken: " + (endTime - startTime) + "ms");
+
+	}
+
+
+	public static List<Integer> mergeKLists(List<List<Integer>> lists, List<int[]> listSizesAndIndex) {
+		Queue<Integer> minHeap = new PriorityQueue<>();
+		
+		for (int[] list : listSizesAndIndex) {
+			System.out.println("list index: " + list[1]);
+			
+			(lists.get(list[1])).forEach(System.out::println);
+			minHeap.addAll(lists.get(list[1]));					
+		}
+		
+		List<Integer> mergedList = new ArrayList<>();
+		while (!minHeap.isEmpty()) {
+			mergedList.add(minHeap.poll());
+		}
+		return mergedList;	
+	}
+
+	public static int[] generateSorted(final int length, final int minVal, final int maxVal) {
+		List<Integer> data = new ArrayList<>(length);
+	
+		for (int i = 0; i < length; i++) {
+			int rndNum = getRandomVal(minVal, maxVal);
+			int insertionPoint = Collections.binarySearch(data, rndNum);
+			data.add(insertionPoint > -1 ? insertionPoint : - insertionPoint - 1, rndNum);
+		}
+	
+		return data.stream().mapToInt(i -> i).toArray();
+	}
+	
+	private static int getRandomVal(int min, int max) {
+		return (int) (Math.random() * (max - min)) + min;
+	}
+
+
+
+}
